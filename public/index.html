@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn Audience Analyzer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    /* ===== FORM SCREEN ===== */
+    .form-screen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .form-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+      max-width: 560px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .li-icon {
+      width: 36px;
+      height: 36px;
+      background: #0a66c2;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .form-header-text h1 {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .form-header-text p {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .form-body {
+      padding: 24px;
+    }
+
+    .field-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    .text-input:focus {
+      border-color: #0a66c2;
+    }
+
+    .text-input::placeholder {
+      color: #aaa;
+    }
+
+    .goal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .goal-option {
+      padding: 14px 16px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .goal-option:hover {
+      border-color: #0a66c2;
+      background: #f0f7ff;
+    }
+
+    .goal-option.selected {
+      border-color: #0a66c2;
+      background: #e8f1fc;
+      color: #0a66c2;
+    }
+
+    .goal-emoji {
+      font-size: 18px;
+    }
+
+    textarea.text-input {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .mb-20 { margin-bottom: 20px; }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: #0a66c2;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover {
+      background: #004182;
+    }
+
+    .submit-btn:disabled {
+      background: #99c5e8;
+      cursor: not-allowed;
+    }
+
+    /* ===== LOADING ===== */
+    .loading-screen {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #1a1f2e;
+      border-top-color: #0a66c2;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-size: 16px;
+      color: #888;
+    }
+
+    /* ===== RESULTS SCREEN ===== */
+    .results-screen {
+      display: none;
+      background: #0d1117;
+      min-height: 100vh;
+      color: #e6edf3;
+    }
+
+    .results-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* Header */
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #161b22;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-bottom: 28px;
+    }
+
+    .result-header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .result-header-left .li-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    }
+
+    .result-header h2 {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .result-header p {
+      font-size: 13px;
+      color: #8b949e;
+    }
+
+    .goal-badge {
+      background: #1c2433;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    /* Section */
+    .section {
+      background: #161b22;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #58a6ff;
+      margin-bottom: 18px;
+    }
+
+    .section-icon {
+      font-size: 18px;
+    }
+
+    /* Audience segments */
+    .segment {
+      background: #1c2433;
+      border-left: 3px solid #58a6ff;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+    }
+
+    .segment:last-child { margin-bottom: 0; }
+
+    .segment h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .segment p {
+      font-size: 13px;
+      color: #8b949e;
+    }
+
+    /* Filter tags */
+    .filter-group {
+      margin-bottom: 16px;
+    }
+
+    .filter-group:last-child { margin-bottom: 0; }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #8b949e;
+      margin-bottom: 8px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: #1c2433;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #c9d1d9;
+    }
+
+    /* Content ideas */
+    .content-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #21262d;
+    }
+
+    .content-item:last-child { border-bottom: none; }
+
+    .content-num {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f0883e;
+      min-width: 24px;
+    }
+
+    .content-text h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .content-text p {
+      font-size: 13px;
+      color: #8b949e;
+    }
+
+    /* Pain & Triggers grid */
+    .pain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .pain-card {
+      background: #1c2433;
+      border-radius: 10px;
+      padding: 16px;
+      border-top: 3px solid;
+    }
+
+    .pain-card.pain { border-color: #f85149; }
+    .pain-card.fear { border-color: #d29922; }
+    .pain-card.trust { border-color: #3fb950; }
+    .pain-card.scroll { border-color: #58a6ff; }
+
+    .pain-card-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pain-card.pain .pain-card-label { color: #f85149; }
+    .pain-card.fear .pain-card-label { color: #d29922; }
+    .pain-card.trust .pain-card-label { color: #3fb950; }
+    .pain-card.scroll .pain-card-label { color: #58a6ff; }
+
+    .pain-card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #c9d1d9;
+    }
+
+    /* Bottom actions */
+    .bottom-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+    }
+
+    .back-btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      border-radius: 24px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .back-btn:hover { background: #30363d; }
+
+    /* Error */
+    .error-msg {
+      display: none;
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .goal-grid { grid-template-columns: 1fr; }
+      .pain-grid { grid-template-columns: 1fr; }
+      .result-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .results-container { padding: 16px 12px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== FORM SCREEN ===== -->
+  <div class="form-screen" id="formScreen">
+    <div class="form-card">
+      <div class="form-header">
+        <div class="li-icon">in</div>
+        <div class="form-header-text">
+          <h1>Target Audience Analyzer</h1>
+          <p>Niche + goal &rarr; LinkedIn strategy</p>
+        </div>
+      </div>
+      <div class="form-body">
+        <div class="mb-20">
+          <div class="field-label">Your niche / expertise</div>
+          <input type="text" class="text-input" id="nicheInput"
+            placeholder="e.g. Financial consultant, HR in IT, SaaS marketer">
+        </div>
+
+        <div class="mb-20">
+          <div class="field-label">Goal on LinkedIn</div>
+          <div class="goal-grid" id="goalGrid">
+            <div class="goal-option" data-goal="clients">
+              <span class="goal-emoji">&#128188;</span> Attract Clients
+            </div>
+            <div class="goal-option" data-goal="career">
+              <span class="goal-emoji">&#128640;</span> Career Growth
+            </div>
+            <div class="goal-option" data-goal="brand">
+              <span class="goal-emoji">&#127919;</span> Personal Brand
+            </div>
+            <div class="goal-option" data-goal="networking">
+              <span class="goal-emoji">&#129309;</span> Networking
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-20">
+          <div class="field-label">Additional context (optional)</div>
+          <textarea class="text-input" id="contextInput"
+            placeholder="Country, language, company size, sector..."></textarea>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" disabled>Analyze Audience</button>
+        <div class="error-msg" id="errorMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="spinner"></div>
+    <div class="loading-text">Analyzing your target audience...</div>
+  </div>
+
+  <!-- ===== RESULTS SCREEN ===== -->
+  <div class="results-screen" id="resultsScreen">
+    <div class="results-container">
+
+      <!-- Header -->
+      <div class="result-header">
+        <div class="result-header-left">
+          <div class="li-icon">in</div>
+          <div>
+            <h2 id="resultNiche"></h2>
+            <p id="resultSummary"></p>
+          </div>
+        </div>
+        <div class="goal-badge" id="resultGoalBadge"></div>
+      </div>
+
+      <!-- Audience Segments -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-icon">&#128100;</span>
+          Who Is Your Target Audience
+        </div>
+        <div id="segmentsContainer"></div>
+      </div>
+
+      <!-- LinkedIn Filters -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-icon">&#128269;</span>
+          LinkedIn Search Filters
+        </div>
+        <div id="filtersContainer"></div>
+      </div>
+
+      <!-- Content Ideas -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-icon">&#128221;</span>
+          Content That Will Attract Them
+        </div>
+        <div id="contentContainer"></div>
+      </div>
+
+      <!-- Pain & Triggers -->
+      <div class="section">
+        <div class="section-title">
+          <span class="section-icon">&#9889;</span>
+          Pain Points &amp; Triggers
+        </div>
+        <div class="pain-grid" id="painContainer"></div>
+      </div>
+
+      <!-- Bottom -->
+      <div class="bottom-actions">
+        <button class="back-btn" id="backBtn">&larr; New Analysis</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== STATE =====
+    let selectedGoal = null;
+
+    // ===== GOAL SELECTION =====
+    document.querySelectorAll('.goal-option').forEach(el => {
+      el.addEventListener('click', () => {
+        document.querySelectorAll('.goal-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedGoal = el.dataset.goal;
+        checkReady();
+      });
+    });
+
+    function checkReady() {
+      const niche = document.getElementById('nicheInput').value.trim();
+      document.getElementById('submitBtn').disabled = !(niche && selectedGoal);
+    }
+
+    document.getElementById('nicheInput').addEventListener('input', checkReady);
+
+    // ===== SUBMIT =====
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const niche = document.getElementById('nicheInput').value.trim();
+      const context = document.getElementById('contextInput').value.trim();
+
+      if (!niche || !selectedGoal) return;
+
+      showScreen('loading');
+
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ niche, goal: selectedGoal, context }),
+        });
+
+        const data = await res.json();
+
+        if (data.error) throw new Error(data.error);
+
+        renderResults(data.analysis);
+        showScreen('results');
+      } catch (err) {
+        showScreen('form');
+        const errEl = document.getElementById('errorMsg');
+        errEl.textContent = 'Error: ' + err.message;
+        errEl.style.display = 'block';
+        setTimeout(() => errEl.style.display = 'none', 6000);
+      }
+    });
+
+    // ===== BACK =====
+    document.getElementById('backBtn').addEventListener('click', () => {
+      showScreen('form');
+    });
+
+    // ===== SCREEN SWITCHING =====
+    function showScreen(name) {
+      document.getElementById('formScreen').style.display = name === 'form' ? 'flex' : 'none';
+      document.getElementById('loadingScreen').style.display = name === 'loading' ? 'flex' : 'none';
+      document.getElementById('resultsScreen').style.display = name === 'results' ? 'block' : 'none';
+      window.scrollTo(0, 0);
+    }
+
+    // ===== RENDER RESULTS =====
+    function renderResults(a) {
+      // Header
+      document.getElementById('resultNiche').textContent = a.header.niche;
+      document.getElementById('resultSummary').textContent = a.header.summary;
+
+      const goalEmojis = { clients: '&#128188;', career: '&#128640;', brand: '&#127919;', networking: '&#129309;' };
+      const goalLabels = { clients: 'Clients', career: 'Career', brand: 'Brand', networking: 'Networking' };
+      document.getElementById('resultGoalBadge').innerHTML =
+        `${goalEmojis[selectedGoal] || ''} ${a.header.goal_label || goalLabels[selectedGoal] || ''}`;
+
+      // Audience Segments
+      const segC = document.getElementById('segmentsContainer');
+      segC.innerHTML = a.audience_segments.map(s => `
+        <div class="segment">
+          <h4>${esc(s.title)}</h4>
+          <p>${esc(s.description)}</p>
+        </div>
+      `).join('');
+
+      // LinkedIn Filters
+      const filC = document.getElementById('filtersContainer');
+      const f = a.linkedin_filters;
+      filC.innerHTML = `
+        ${filterGroup('Job Title (Search for these people)', f.job_titles)}
+        ${filterGroup('Industry', f.industries)}
+        ${filterGroup('Company Size', f.company_size)}
+        ${filterGroup('Keywords in Target Audience Profile', f.keywords)}
+      `;
+
+      // Content Ideas
+      const conC = document.getElementById('contentContainer');
+      conC.innerHTML = a.content_ideas.map((c, i) => `
+        <div class="content-item">
+          <div class="content-num">${String(i + 1).padStart(2, '0')}</div>
+          <div class="content-text">
+            <h4>${esc(c.title)}</h4>
+            <p>Format: ${esc(c.format)}</p>
+          </div>
+        </div>
+      `).join('');
+
+      // Pain & Triggers
+      const painC = document.getElementById('painContainer');
+      const pt = a.pain_triggers;
+      painC.innerHTML = `
+        <div class="pain-card pain">
+          <div class="pain-card-label">&#129324; Main Pain</div>
+          <p>${esc(pt.main_pain)}</p>
+        </div>
+        <div class="pain-card fear">
+          <div class="pain-card-label">&#128552; Fear</div>
+          <p>${esc(pt.fear)}</p>
+        </div>
+        <div class="pain-card trust">
+          <div class="pain-card-label">&#9989; What Builds Trust</div>
+          <p>${esc(pt.trust_builder)}</p>
+        </div>
+        <div class="pain-card scroll">
+          <div class="pain-card-label">&#129688; What Makes Them Stop</div>
+          <p>${esc(pt.scroll_stopper)}</p>
+        </div>
+      `;
+    }
+
+    function filterGroup(label, items) {
+      if (!items || items.length === 0) return '';
+      return `
+        <div class="filter-group">
+          <div class="filter-label">${esc(label)}</div>
+          <div class="tags">
+            ${items.map(t => `<span class="tag">${esc(t)}</span>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+  </script>
+</body>
+</html>
