@@ -4,14 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LinkedIn Audience Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --border: #e1e7ef;
+      --border-hover: #c8d2e0;
+      --text: #1a2332;
+      --text-secondary: #3d4f63;
+      --muted: #7a8a9e;
+      --accent: #1a56db;
+      --accent-light: #eef2ff;
+      --accent-hover: #1347b8;
+      --input-border: #d1d9e6;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+    }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f5;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
       min-height: 100vh;
-      color: #333;
+      background-image:
+        radial-gradient(ellipse 90% 50% at 50% -10%, rgba(26,86,219,0.06), transparent);
     }
 
     /* ===== FORM SCREEN ===== */
@@ -23,138 +46,129 @@
       padding: 20px;
     }
 
-    .form-card {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    .form-wrapper {
       max-width: 560px;
       width: 100%;
-      overflow: hidden;
     }
 
-    .form-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 20px 24px;
-      border-bottom: 1px solid #eee;
+    .form-title {
+      text-align: center;
+      margin-bottom: 2rem;
     }
 
-    .li-icon {
-      width: 36px;
-      height: 36px;
-      background: #0a66c2;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
+    .form-title h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 2rem;
       font-weight: 700;
-      font-size: 16px;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
     }
 
-    .form-header-text h1 {
-      font-size: 17px;
-      font-weight: 600;
+    .form-title h1 em {
+      color: var(--accent);
+      font-style: italic;
     }
 
-    .form-header-text p {
-      font-size: 13px;
-      color: #888;
+    .form-title p {
+      color: var(--muted);
+      font-size: 0.92rem;
     }
 
-    .form-body {
-      padding: 24px;
+    .form-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 2rem;
     }
 
     .field-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: #555;
-      margin-bottom: 8px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: block;
+      margin-bottom: 0.4rem;
     }
 
     .text-input {
       width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
       font-family: inherit;
+      background: #fff;
+      color: var(--text);
+      transition: all 0.2s;
     }
 
-    .text-input:focus {
-      border-color: #0a66c2;
+    .text-input::placeholder { color: #b0bac8; }
+    .text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,86,219,0.1); }
+
+    textarea.text-input {
+      min-height: 70px;
+      resize: vertical;
     }
 
-    .text-input::placeholder {
-      color: #aaa;
-    }
+    .mb-20 { margin-bottom: 1.25rem; }
 
     .goal-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 20px;
     }
 
     .goal-option {
-      padding: 14px 16px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-sm);
       cursor: pointer;
       transition: all 0.2s;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 14px;
+      font-size: 0.88rem;
       font-weight: 500;
+      color: var(--text-secondary);
     }
 
     .goal-option:hover {
-      border-color: #0a66c2;
-      background: #f0f7ff;
+      border-color: var(--accent);
+      background: var(--accent-light);
     }
 
     .goal-option.selected {
-      border-color: #0a66c2;
-      background: #e8f1fc;
-      color: #0a66c2;
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
     }
 
-    .goal-emoji {
-      font-size: 18px;
-    }
-
-    textarea.text-input {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .mb-20 { margin-bottom: 20px; }
+    .goal-emoji { font-size: 17px; }
 
     .submit-btn {
       width: 100%;
-      padding: 14px;
-      background: #0a66c2;
+      padding: 0.75rem 1.75rem;
+      background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+      margin-top: 0.5rem;
     }
 
-    .submit-btn:hover {
-      background: #004182;
+    .submit-btn:hover:not(:disabled) {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 14px rgba(26,86,219,0.25);
+      transform: translateY(-1px);
     }
 
     .submit-btn:disabled {
-      background: #99c5e8;
+      opacity: 0.4;
       cursor: not-allowed;
     }
 
@@ -169,10 +183,10 @@
     }
 
     .spinner {
-      width: 48px;
-      height: 48px;
-      border: 4px solid #1a1f2e;
-      border-top-color: #0a66c2;
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -180,22 +194,23 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .loading-text {
-      font-size: 16px;
-      color: #888;
+      font-size: 0.92rem;
+      color: var(--muted);
     }
 
     /* ===== RESULTS SCREEN ===== */
     .results-screen {
       display: none;
-      background: #0d1117;
+      background: var(--bg);
       min-height: 100vh;
-      color: #e6edf3;
+      background-image:
+        radial-gradient(ellipse 90% 50% at 50% -10%, rgba(26,86,219,0.06), transparent);
     }
 
     .results-container {
       max-width: 720px;
       margin: 0 auto;
-      padding: 32px 20px 60px;
+      padding: 2.5rem 1.5rem 4rem;
     }
 
     /* Header */
@@ -203,10 +218,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #161b22;
-      border-radius: 14px;
-      padding: 18px 22px;
-      margin-bottom: 28px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
     }
 
     .result-header-left {
@@ -215,91 +232,101 @@
       gap: 14px;
     }
 
-    .result-header-left .li-icon {
-      width: 40px;
-      height: 40px;
-      font-size: 18px;
+    .li-icon {
+      width: 38px;
+      height: 38px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
     }
 
     .result-header h2 {
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
     }
 
     .result-header p {
-      font-size: 13px;
-      color: #8b949e;
+      font-size: 0.82rem;
+      color: var(--muted);
     }
 
     .goal-badge {
-      background: #1c2433;
-      border: 1px solid #30363d;
+      background: var(--accent-light);
+      border: 1px solid rgba(26,86,219,0.15);
       border-radius: 20px;
       padding: 6px 14px;
-      font-size: 13px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
       white-space: nowrap;
     }
 
     /* Section */
     .section {
-      background: #161b22;
-      border-radius: 14px;
-      padding: 24px;
-      margin-bottom: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow-sm);
     }
 
     .section-title {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 13px;
+      font-size: 0.75rem;
       font-weight: 700;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
-      color: #58a6ff;
-      margin-bottom: 18px;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
     }
 
-    .section-icon {
-      font-size: 18px;
-    }
+    .section-icon { font-size: 17px; }
 
     /* Audience segments */
     .segment {
-      background: #1c2433;
-      border-left: 3px solid #58a6ff;
-      border-radius: 8px;
-      padding: 14px 18px;
-      margin-bottom: 10px;
+      background: #f7f9fc;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem 1.1rem;
+      margin-bottom: 0.6rem;
     }
 
     .segment:last-child { margin-bottom: 0; }
 
     .segment h4 {
-      font-size: 15px;
+      font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 4px;
+      color: var(--text);
+      margin-bottom: 2px;
     }
 
     .segment p {
-      font-size: 13px;
-      color: #8b949e;
+      font-size: 0.82rem;
+      color: var(--muted);
     }
 
     /* Filter tags */
-    .filter-group {
-      margin-bottom: 16px;
-    }
-
+    .filter-group { margin-bottom: 1rem; }
     .filter-group:last-child { margin-bottom: 0; }
 
     .filter-label {
-      font-size: 11px;
+      font-size: 0.7rem;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: #8b949e;
-      margin-bottom: 8px;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
     }
 
     .tags {
@@ -309,41 +336,44 @@
     }
 
     .tag {
-      background: #1c2433;
-      border: 1px solid #30363d;
+      background: var(--accent-light);
+      border: 1px solid rgba(26,86,219,0.12);
       border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 13px;
-      color: #c9d1d9;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 500;
     }
 
     /* Content ideas */
     .content-item {
       display: flex;
-      gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid #21262d;
+      gap: 14px;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
     }
 
     .content-item:last-child { border-bottom: none; }
 
     .content-num {
-      font-size: 14px;
+      font-size: 0.85rem;
       font-weight: 700;
-      color: #f0883e;
+      color: var(--accent);
       min-width: 24px;
+      opacity: 0.6;
     }
 
     .content-text h4 {
-      font-size: 15px;
+      font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 4px;
-      line-height: 1.4;
+      color: var(--text);
+      margin-bottom: 2px;
+      line-height: 1.45;
     }
 
     .content-text p {
-      font-size: 13px;
-      color: #8b949e;
+      font-size: 0.82rem;
+      color: var(--muted);
     }
 
     /* Pain & Triggers grid */
@@ -354,37 +384,38 @@
     }
 
     .pain-card {
-      background: #1c2433;
-      border-radius: 10px;
-      padding: 16px;
+      background: #f7f9fc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
       border-top: 3px solid;
     }
 
-    .pain-card.pain { border-color: #f85149; }
-    .pain-card.fear { border-color: #d29922; }
-    .pain-card.trust { border-color: #3fb950; }
-    .pain-card.scroll { border-color: #58a6ff; }
+    .pain-card.pain { border-top-color: #dc3545; }
+    .pain-card.fear { border-top-color: #e8a317; }
+    .pain-card.trust { border-top-color: #16a34a; }
+    .pain-card.scroll { border-top-color: var(--accent); }
 
     .pain-card-label {
-      font-size: 11px;
+      font-size: 0.7rem;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 0.5rem;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
     }
 
-    .pain-card.pain .pain-card-label { color: #f85149; }
-    .pain-card.fear .pain-card-label { color: #d29922; }
-    .pain-card.trust .pain-card-label { color: #3fb950; }
-    .pain-card.scroll .pain-card-label { color: #58a6ff; }
+    .pain-card.pain .pain-card-label { color: #dc3545; }
+    .pain-card.fear .pain-card-label { color: #e8a317; }
+    .pain-card.trust .pain-card-label { color: #16a34a; }
+    .pain-card.scroll .pain-card-label { color: var(--accent); }
 
     .pain-card p {
-      font-size: 14px;
+      font-size: 0.85rem;
       line-height: 1.5;
-      color: #c9d1d9;
+      color: var(--text-secondary);
     }
 
     /* Bottom actions */
@@ -392,40 +423,45 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 28px;
+      margin-top: 1.5rem;
     }
 
     .back-btn {
-      background: #21262d;
-      border: 1px solid #30363d;
-      color: #c9d1d9;
-      border-radius: 24px;
-      padding: 12px 24px;
-      font-size: 14px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      padding: 0.65rem 1.5rem;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
+      font-family: inherit;
     }
 
-    .back-btn:hover { background: #30363d; }
+    .back-btn:hover {
+      background: #e8eef6;
+    }
 
     /* Error */
     .error-msg {
       display: none;
       background: #fef2f2;
-      color: #dc2626;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      margin-top: 12px;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
     }
 
     /* Responsive */
     @media (max-width: 600px) {
+      .form-title h1 { font-size: 1.5rem; }
       .goal-grid { grid-template-columns: 1fr; }
       .pain-grid { grid-template-columns: 1fr; }
       .result-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-      .results-container { padding: 16px 12px 40px; }
+      .results-container { padding: 1rem 0.75rem 2.5rem; }
     }
   </style>
 </head>
@@ -433,23 +469,20 @@
 
   <!-- ===== FORM SCREEN ===== -->
   <div class="form-screen" id="formScreen">
-    <div class="form-card">
-      <div class="form-header">
-        <div class="li-icon">in</div>
-        <div class="form-header-text">
-          <h1>Target Audience Analyzer</h1>
-          <p>Niche + goal &rarr; LinkedIn strategy</p>
-        </div>
+    <div class="form-wrapper">
+      <div class="form-title">
+        <h1>LinkedIn <em>Audience</em> Analyzer</h1>
+        <p>Enter your niche and goal to get a full target audience strategy.</p>
       </div>
-      <div class="form-body">
+      <div class="form-card">
         <div class="mb-20">
-          <div class="field-label">Your niche / expertise</div>
+          <label class="field-label">Your niche / expertise *</label>
           <input type="text" class="text-input" id="nicheInput"
             placeholder="e.g. Financial consultant, HR in IT, SaaS marketer">
         </div>
 
         <div class="mb-20">
-          <div class="field-label">Goal on LinkedIn</div>
+          <label class="field-label">Goal on LinkedIn</label>
           <div class="goal-grid" id="goalGrid">
             <div class="goal-option" data-goal="clients">
               <span class="goal-emoji">&#128188;</span> Attract Clients
@@ -467,7 +500,7 @@
         </div>
 
         <div class="mb-20">
-          <div class="field-label">Additional context (optional)</div>
+          <label class="field-label">Additional context (optional)</label>
           <textarea class="text-input" id="contextInput"
             placeholder="Country, language, company size, sector..."></textarea>
         </div>
